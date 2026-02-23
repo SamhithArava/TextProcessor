@@ -5,27 +5,26 @@ def create_database():
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS students (
+    CREATE TABLE IF NOT EXISTS text_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        branch TEXT,
-        marks INTEGER
+        chunk TEXT,
+        score INTEGER,
+        sentiment TEXT
     )
     """)
 
-    students_data = [
-        ("Sam", "CSE", 85),
-        ("Ravi", "ECE", 78),
-        ("Anu", "CSE", 92),
-        ("Priya", "EEE", 88),
-        ("Kiran", "MECH", 74)
-    ]
+    conn.commit()
+    conn.close()
 
-    cursor.executemany(
-        "INSERT INTO students (name, branch, marks) VALUES (?, ?, ?)",
-        students_data
-    )
+
+def insert_result(chunk_text, score, sentiment):
+    conn = sqlite3.connect("students.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO text_results (chunk, score, sentiment)
+    VALUES (?, ?, ?)
+    """, (chunk_text, score, sentiment))
 
     conn.commit()
     conn.close()
-    print("Database created and 5 records inserted.")
