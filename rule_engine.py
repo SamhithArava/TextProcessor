@@ -1,25 +1,33 @@
-positive_words = ["good", "excellent", "happy", "great", "amazing"]
-negative_words = ["bad", "terrible", "sad", "worst", "poor"]
+positive_rules = {
+    "excellent": 3,
+    "amazing": 2,
+    "good": 1,
+    "happy": 2
+}
+
+negative_rules = {
+    "terrible": -3,
+    "bad": -1,
+    "worst": -2,
+    "error": -2
+}
 
 def analyze_chunk(chunk):
-    positive_count = 0
-    negative_count = 0
+    score = 0
 
     for line in chunk:
         words = line.lower().split()
         for word in words:
-            if word in positive_words:
-                positive_count += 1
-            elif word in negative_words:
-                negative_count += 1
-
-    score = positive_count - negative_count
+            if word in positive_rules:
+                score += positive_rules[word]
+            elif word in negative_rules:
+                score += negative_rules[word]
 
     if score > 0:
-        tag = "Positive"
+        sentiment = "Positive"
     elif score < 0:
-        tag = "Negative"
+        sentiment = "Negative"
     else:
-        tag = "Neutral"
+        sentiment = "Neutral"
 
-    return score, tag
+    return score, sentiment

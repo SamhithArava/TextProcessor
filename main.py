@@ -1,28 +1,42 @@
 from file_handler import read_file, split_into_chunks
-from database import create_database, insert_result
 from rule_engine import analyze_chunk
+from database import create_database
 from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import Pool
 import time
 
 
-if __name__ == "__main__":
+def single_processing(chunks):
+    results = []
+    for chunk in chunks:
+        results.append(analyze_chunk(chunk))
+    return results
 
-    start_time = time.time()
+
+if __name__ == "__main__":
 
     create_database()
 
     lines = read_file("input.txt")
     chunks = split_into_chunks(lines, 100)
 
+    print("\n----- PERFORMANCE COMPARISON -----\n")
+
+    start = time.time()
+    single_results = single_processing(chunks)
+    end = time.time()
+    print("Single Processing Time:", round(end - start, 4), "seconds")
+
+    start = time.time()
     with ThreadPoolExecutor() as executor:
-        results = list(executor.map(analyze_chunk, chunks))
+        thread_results = list(executor.map(analyze_chunk, chunks))
+    end = time.time()
+    print("ThreadPool Time:", round(end - start, 4), "seconds")
 
-    for chunk, result in zip(chunks, results):
-        score, tag = result
-        chunk_text = " ".join(chunk)
-        insert_result(chunk_text, score, tag)
+    start = time.time()
+    with Pool() as pool:
+        process_results = pool.map(analyze_chunk, chunks)
+    end = time.time()
+    print("Multiprocessing Time:", round(end - start, 4), "seconds")
 
-    end_time = time.time()
-
-    print("Processing completed.")
-    print("Execution Time:", end_time - start_time)
+    print("\nPerformance comparison completed.\n")

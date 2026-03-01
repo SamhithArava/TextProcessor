@@ -1,5 +1,10 @@
-with open("input.txt", "w") as f:
-    for i in range(1000):
-        f.write(f"This is sample line number {i}\n")
+def generate_reviews(n):
+    with open("input.txt", "w") as f:
+        for i in range(n):
+            f.write("This product is amazing but has one minor error\n")
 
-print("1000 lines created successfully!")
+
+if __name__ == "__main__":
+    n = int(input("Enter number of reviews to generate: "))
+    generate_reviews(n)
+    print(f"{n} reviews generated successfully.")
