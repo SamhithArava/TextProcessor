@@ -1,6 +1,6 @@
 from file_handler import read_file, split_into_chunks
 from rule_engine import analyze_chunk
-from database import create_database
+from database import create_database, bulk_insert, test_query
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
 import time
@@ -18,7 +18,8 @@ if __name__ == "__main__":
     create_database()
 
     lines = read_file("input.txt")
-    chunks = split_into_chunks(lines, 100)
+    chunk_size = int(input("Enter chunk size: "))
+    chunks = split_into_chunks(lines, chunk_size)
 
     print("\n----- PERFORMANCE COMPARISON -----\n")
 
@@ -39,4 +40,19 @@ if __name__ == "__main__":
     end = time.time()
     print("Multiprocessing Time:", round(end - start, 4), "seconds")
 
-    print("\nPerformance comparison completed.\n")
+    data_to_insert = []
+
+    for chunk, result in zip(chunks, single_results):
+        score, tag = result
+        chunk_text = " ".join(chunk)
+        data_to_insert.append((chunk_text, score, tag))
+
+    start = time.time()
+    bulk_insert(data_to_insert)
+    end = time.time()
+    print("Bulk Insert Time:", round(end - start, 4), "seconds")
+
+    query_time = test_query()
+    print("Query Time:", round(query_time, 4), "seconds")
+
+    print("\nMilestone 2 Execution Completed.\n")

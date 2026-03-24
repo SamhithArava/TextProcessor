@@ -1,7 +1,8 @@
 import sqlite3
+import time
 
 def create_database():
-    conn = sqlite3.connect("students.db")
+    conn = sqlite3.connect("text_results.db")
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -13,18 +14,33 @@ def create_database():
     )
     """)
 
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_sentiment ON text_results(sentiment)")
+
     conn.commit()
     conn.close()
 
 
-def insert_result(chunk_text, score, sentiment):
-    conn = sqlite3.connect("students.db")
+def bulk_insert(data):
+    conn = sqlite3.connect("text_results.db")
     cursor = conn.cursor()
 
-    cursor.execute("""
-    INSERT INTO text_results (chunk, score, sentiment)
-    VALUES (?, ?, ?)
-    """, (chunk_text, score, sentiment))
+    cursor.executemany(
+        "INSERT INTO text_results (chunk, score, sentiment) VALUES (?, ?, ?)",
+        data
+    )
 
     conn.commit()
     conn.close()
+
+
+def test_query():
+    conn = sqlite3.connect("text_results.db")
+    cursor = conn.cursor()
+
+    start = time.time()
+    cursor.execute("SELECT * FROM text_results WHERE sentiment='Positive'")
+    cursor.fetchall()
+    end = time.time()
+
+    conn.close()
+    return end - start

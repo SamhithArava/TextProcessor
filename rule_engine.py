@@ -14,7 +14,6 @@ negative_rules = {
 
 def analyze_chunk(chunk):
     score = 0
-
     for line in chunk:
         words = line.lower().split()
         for word in words:

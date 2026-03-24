@@ -1,132 +1,176 @@
-Parallel Text Processing System with Rule-Based Sentiment Analysis
-Abstract
-This project presents a modular text processing system designed to efficiently handle large textual datasets using parallel execution techniques in Python. The system implements chunk-based processing, rule-based sentiment evaluation, structured database storage, and execution time measurement. The architecture emphasizes modularity, scalability, and clarity of implementation.
+Python Parallel Text Processing System
+Milestone 2 – Performance, Scalability, and Optimization
+1. Project Overview
+This project implements a scalable text processing pipeline using Python. The system is designed to process large volumes of textual data efficiently using parallel execution techniques and rule-based sentiment analysis.
 
-Problem Statement
-Processing large text files sequentially can lead to performance bottlenecks. The objective of this project is to design a structured processing pipeline that:
+Milestone 1 focused on building a working pipeline.
+Milestone 2 focuses on improving performance, benchmarking execution models, testing scalability, and optimizing database operations.
 
-Segments large datasets into manageable chunks
-
-Executes chunk processing concurrently
-
-Applies deterministic sentiment scoring
-
-Stores results in a relational database
-
-Measures execution performance
-
-System Architecture
-The system follows a layered processing model:
+2. System Architecture
+The system follows a structured processing pipeline:
 
 Input File
    ↓
-Text Segmentation (Chunking)
+Chunk Segmentation
    ↓
-Parallel Execution
+Processing (Single / Threading / Multiprocessing)
    ↓
-Rule-Based Sentiment Evaluation
+Weighted Sentiment Evaluation
    ↓
-SQLite Database Storage
+Bulk Database Insert
    ↓
-Execution Summary
-Design Principles
-Modular separation of concerns
+Indexed Query Execution
+   ↓
+Performance Reporting
+3. Project Structure
+TextProcessor/
+│
+├── main.py               # Core pipeline controller
+├── file_handler.py       # File reading and chunk logic
+├── rule_engine.py        # Weighted sentiment scoring engine
+├── database.py           # SQLite integration & optimization
+├── generate_input.py     # Scalable dataset generator
+├── input.txt             # Input dataset
+├── text_results.db       # SQLite database
+├── .gitignore
+└── README.md
+4. Weighted Rule-Based Sentiment Engine
+Milestone 2 replaces simple counting with weighted scoring.
 
-Clean function-level abstraction
-
-Parallel computation using thread pools
-
-Lightweight database integration
-
-Deterministic rule-based evaluation
-
-Implementation Details
-1. File Handling and Chunking
-Large text files are read into memory and segmented into fixed-size chunks using range-based slicing:
-
-Ensures scalability
-
-Enables distributed execution
-
-Maintains manageable processing units
-
-2. Parallel Processing
-Parallel execution is implemented using:
-
-ThreadPoolExecutor
-Each chunk is assigned to a worker thread where sentiment evaluation is performed concurrently. This reduces overall processing time compared to sequential iteration.
-
-3. Rule-Based Sentiment Engine
-Sentiment scoring follows a deterministic model:
-
-score = positive_count - negative_count
-Classification logic:
-
+Positive Rules
+"excellent": +3
+"amazing": +2
+"good": +1
+"happy": +2
+Negative Rules
+"terrible": -3
+"bad": -1
+"worst": -2
+"error": -2
+Scoring Formula
+Final Score = Sum of matched word weights
+Classification
 Score > 0 → Positive
 
 Score < 0 → Negative
 
 Score = 0 → Neutral
 
-This approach avoids external dependencies and maintains full transparency of scoring logic.
+This allows more expressive and realistic sentiment evaluation.
 
-4. Database Integration
-SQLite is used as a lightweight relational storage system.
+5. Parallel Processing Benchmarking
+The system compares three execution models:
 
-Each processed chunk is stored with:
+1. Single Processing
+Standard for-loop execution.
 
-Chunk Text
+2. ThreadPoolExecutor
+Uses multiple threads for concurrent execution.
 
-Sentiment Score
+3. Multiprocessing Pool
+Uses separate processes for true parallel execution.
 
-Sentiment Label
+Performance Measurement
+Execution time is recorded using:
 
-The database schema ensures structured and persistent storage of processed results.
+time.time()
+Example Output:
 
-5. Execution Time Measurement
-Total runtime is measured using Python’s time module to evaluate performance characteristics of the parallel implementation.
+Single Processing Time: 4.82 seconds
+ThreadPool Time: 4.11 seconds
+Multiprocessing Time: 2.35 seconds
+6. CPU-Bound vs I/O-Bound Analysis
+This workload is CPU-bound because:
 
-Project Structure
-TextProcessor/
-│
-├── main.py
-├── file_handler.py
-├── rule_engine.py
-├── database.py
-├── generate_input.py
-├── input.txt
-├── .gitignore
-└── README.md
-How to Execute
-Run the main pipeline:
+Sentiment scoring involves repeated computation
 
-python main.py
-To generate sample input:
+Word matching operations dominate execution
 
+Minimal waiting on file or network I/O
+
+Multiprocessing performs better due to Python's Global Interpreter Lock (GIL), which restricts true parallelism in threading for CPU-bound tasks.
+
+7. Scalability Testing
+The system was tested with increasing dataset sizes:
+
+100 reviews
+
+10,000 reviews
+
+100,000 reviews
+
+For each dataset, the following metrics were recorded:
+
+Processing time
+
+Bulk insert time
+
+Query time
+
+Performance growth was analyzed to observe scalability patterns.
+
+8. Database Optimization
+Milestone 2 introduces two major optimizations:
+
+1. Bulk Insert using executemany()
+Instead of inserting row-by-row, all processed data is inserted in a single transaction.
+This significantly reduces commit overhead.
+
+2. Index Creation
+CREATE INDEX idx_sentiment ON text_results(sentiment);
+This improves filtering queries on sentiment.
+
+Query Benchmark
+Query time before and after indexing shows measurable improvement, especially for large datasets.
+
+9. Performance Components Measured
+The system records:
+
+Single Processing Time
+
+ThreadPool Time
+
+Multiprocessing Time
+
+Bulk Insert Time
+
+Indexed Query Time
+
+This provides full visibility into computational and database overhead.
+
+10. How to Run
+Step 1 – Generate Dataset
 python generate_input.py
-Evaluation Focus
-This implementation demonstrates:
+Enter desired number of reviews.
 
-Practical use of concurrency in Python
+Step 2 – Execute Pipeline
+python main.py
+Enter chunk size when prompted.
 
-Structured modular design
+11. Key Learnings from Milestone 2
+Weighted rule systems provide more realistic scoring.
 
-Clean database integration
+Multiprocessing improves CPU-bound workload performance.
 
-Deterministic text analysis logic
+Threading may not outperform single execution due to GIL.
 
-Performance monitoring
+Bulk insertion drastically improves database write speed.
 
-Scope for Enhancement
-Search and filtering functionality
+Indexing significantly reduces query time.
 
-CSV export capability
+Scalability testing reveals non-linear growth patterns.
 
-API layer for external access
+12. Future Improvements
+Replace rule engine with NLP model
 
-User interface integration
+Add REST API layer
 
-Advanced NLP model integration
+Add visualization dashboard
 
-Author
+Introduce caching layer
+
+Implement distributed processing
+
+13. Author
 Samhith Arava
+
