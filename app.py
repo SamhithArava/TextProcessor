@@ -5,10 +5,45 @@ import matplotlib.pyplot as plt
 import time
 import math
 from concurrent.futures import ThreadPoolExecutor
+import smtplib
+from email.mime.text import MIMEText
 
 st.set_page_config(page_title="Sentiment Analyzer", layout="wide")
 
 st.title("🚀 Advanced Text Sentiment Analyzer")
+
+# ---------------- EMAIL FUNCTION ----------------
+def send_email_report(to_email, total, pos, neg, neu, score):
+
+    sender_email = "your_email@gmail.com"
+    sender_password = "your_app_password"
+
+    subject = "Sentiment Analysis Report"
+
+    body = f"""
+Sentiment Analysis Report
+
+Total Records: {total}
+Positive: {pos}
+Negative: {neg}
+Neutral: {neu}
+Total Score: {score}
+"""
+
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = sender_email
+    msg["To"] = to_email
+
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+        return True
+    except:
+        return False
 
 # ---------------- QUICK ANALYZER ----------------
 st.subheader("⚡ Quick Analyzer")
@@ -47,7 +82,7 @@ if uploaded_file:
 
         data = df[column].dropna().astype(str).tolist()
 
-        chunk_size = st.slider("Select Chunk Size", 100, 5000, 1000)
+        chunk_size = st.slider("Chunk Size", 100, 5000, 1000)
         total_chunks = math.ceil(len(data) / chunk_size)
 
         if st.button("🚀 Process Data"):
@@ -75,16 +110,14 @@ if uploaded_file:
                 thread_results = list(executor.map(process_line, data))
             thread_time = time.time() - start
 
-            # -------- SAFE MULTIPROCESS (SIMULATED) --------
+            # -------- SAFE MULTIPROCESS --------
             start = time.time()
             process_results = [process_line(x) for x in data]
             process_time = time.time() - start
 
-            # assign final results
             df["Score"] = scores
             df["Sentiment"] = sentiments
 
-            # store for search
             st.session_state["df"] = df
             st.session_state["column"] = column
 
@@ -122,11 +155,26 @@ if uploaded_file:
             col1.metric("Total Records", len(data))
             col2.metric("Chunks", total_chunks)
             col3.metric("Chunk Size", chunk_size)
-            col4.metric("Mode", "Simulated Multi")
+            col4.metric("Mode", "Thread + Simulated Multi")
 
             st.write(f"🟢 Single: {round(single_time,4)} sec")
             st.write(f"🟡 Thread: {round(thread_time,4)} sec")
             st.write(f"🔴 Multiprocessing: {round(process_time,4)} sec")
+
+            # ---------------- EMAIL ----------------
+            st.subheader("📧 Email Report")
+
+            email = st.text_input("Enter email")
+
+            if st.button("Send Report"):
+                if email:
+                    success = send_email_report(email, len(df), pos, neg, neu, total_score)
+                    if success:
+                        st.success("Email sent successfully!")
+                    else:
+                        st.error("Failed to send email")
+                else:
+                    st.warning("Enter email first")
 
             # DOWNLOAD
             st.download_button("📥 Download CSV", df.to_csv(index=False), "output.csv")
