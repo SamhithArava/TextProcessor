@@ -1,27 +1,25 @@
+import random
+
 feedbacks = [
-    "The faculty teaching was excellent and very helpful",
-    "The course content was good but could be improved",
-    "The lab sessions were amazing and interactive",
-    "The experience was bad due to lack of resources",
-    "The teacher explained concepts clearly and nicely",
-    "The class was boring and not engaging",
-    "The project guidance was excellent and very useful",
-    "The overall experience was terrible and stressful",
-    "The course was good and well structured",
-    "The teaching quality was poor and confusing",
-    "very good teaching and excellent explanation",
-    "not good teaching method",
+    "The teaching was excellent and very helpful",
+    "The course content was good",
+    "The class was amazing and interactive",
+    "The experience was bad and boring",
+    "The teacher explanation was poor",
+    "The session was difficult to understand",
     "good good bad explanation",
-    "very bad experience in lab",
-    "amazing support from faculty"
+    "not good teaching method",
+    "very good teaching and excellent explanation",
+    "terrible experience in lab",
+    "average experience nothing special",
+    "it is okay not bad not great"
 ]
 
 def generate_reviews(n):
     with open("student_feedback.csv", "w") as f:
         f.write("text\n")
         for i in range(n):
-            f.write(feedbacks[i % len(feedbacks)] + "\n")
-
+            f.write(random.choice(feedbacks) + "\n")
 
 if __name__ == "__main__":
     generate_reviews(50000)

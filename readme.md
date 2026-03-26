@@ -1,176 +1,212 @@
-Python Parallel Text Processing System
-Milestone 2 – Performance, Scalability, and Optimization
-1. Project Overview
-This project implements a scalable text processing pipeline using Python. The system is designed to process large volumes of textual data efficiently using parallel execution techniques and rule-based sentiment analysis.
+# 🚀 Parallel Text Sentiment Analyzer
 
-Milestone 1 focused on building a working pipeline.
-Milestone 2 focuses on improving performance, benchmarking execution models, testing scalability, and optimizing database operations.
+## 📌 Project Overview
+This project is a web-based sentiment analysis system designed to process large-scale text datasets efficiently. It allows users to upload files, analyze textual data using rule-based sentiment scoring, and visualize results through interactive dashboards.
 
-2. System Architecture
-The system follows a structured processing pipeline:
+The system also demonstrates the concept of parallel processing by comparing execution performance between sequential and parallel approaches.
 
-Input File
-   ↓
-Chunk Segmentation
-   ↓
-Processing (Single / Threading / Multiprocessing)
-   ↓
-Weighted Sentiment Evaluation
-   ↓
-Bulk Database Insert
-   ↓
-Indexed Query Execution
-   ↓
-Performance Reporting
-3. Project Structure
+---
+
+## 🎯 Objective
+The main objective of this project is to:
+- Analyze large volumes of text data
+- Classify sentiment into Positive, Negative, and Neutral
+- Improve performance using parallel processing
+- Provide a user-friendly interface for data interaction
+
+---
+
+## ✨ Features Implemented
+
+### 📁 File Upload
+- Supports CSV, TXT, and Excel files
+- Handles large datasets (50,000+ records)
+
+### ⚡ Quick Analyzer
+- Analyze individual sentences instantly
+- Useful for testing sentiment logic
+
+### 🔍 Search Functionality
+- Allows users to search specific keywords
+- Filters matching records dynamically
+
+### 📊 Dashboard
+Displays:
+- Total number of records
+- Positive count
+- Negative count
+- Neutral count
+- Total sentiment score
+
+### 📈 Visualization
+- Bar chart for sentiment distribution
+- Pie chart for percentage representation
+
+### 📥 Export Feature
+- Download processed results as CSV file
+
+### ⚡ Performance Analysis
+- Compares execution time for:
+  - Sequential processing
+  - Multithreading
+  - Simulated multiprocessing
+- Displays chunk size and number of chunks
+
+---
+
+## 🧠 Sentiment Analysis Logic
+
+The system uses a rule-based approach:
+
+### Positive Words
+```
+good, excellent, amazing, great, happy
+```
+
+### Negative Words
+```
+bad, terrible, worst, poor, boring, difficult
+```
+
+### Scoring Method
+- Each positive word → +1
+- Each negative word → -1
+- Final Score = Positive count - Negative count
+
+### Special Cases Handled
+- **"not good"** → considered negative
+- **"very good"** → strong positive
+- Repeated words are counted multiple times
+
+### Example:
+```
+Input: good good bad
+Score: +1 +1 -1 = +1 → Positive
+```
+
+---
+
+## ⚙️ Parallel Processing Logic
+
+The system compares three processing methods:
+
+### 1. Sequential Processing
+- Processes data line by line
+- Simple but slower for large datasets
+
+### 2. Multithreading
+- Uses ThreadPoolExecutor
+- Faster for I/O-bound tasks
+
+### 3. Multiprocessing (Simulated)
+- Designed to demonstrate multi-core execution
+- In Streamlit, true multiprocessing can cause instability
+- Hence a safe simulation approach is used
+
+### Key Concept:
+- Parallel processing improves performance for large datasets
+- Overhead may make it slower for small datasets
+
+---
+
+## 📊 Dataset Details
+
+- Dataset consists of student feedback
+- Generated programmatically
+- Includes:
+  - Positive sentences
+  - Negative sentences
+  - Neutral sentences
+  - Mixed and repeated word cases
+
+### Example:
+```
+The teaching was excellent and helpful
+The experience was bad and boring
+good good bad explanation
+not good teaching method
+```
+
+---
+
+## ⚡ Performance Comparison
+
+| Method          | Behavior |
+|----------------|--------|
+| Sequential     | Simple but slower |
+| Threading      | Moderate speed improvement |
+| Multiprocessing| Best for CPU-heavy tasks |
+
+### Observation:
+- For small datasets → Sequential may be faster
+- For large datasets → Parallel processing performs better
+
+---
+
+## ⚠️ Edge Cases Handled
+
+- Empty input file
+- Invalid file format
+- Missing text column
+- Large dataset handling (50K+ records)
+- Repeated words
+- Special phrases ("not good", "very good")
+- Case-insensitive search
+
+---
+
+## 🏗️ Project Structure
+
+```
 TextProcessor/
-│
-├── main.py               # Core pipeline controller
-├── file_handler.py       # File reading and chunk logic
-├── rule_engine.py        # Weighted sentiment scoring engine
-├── database.py           # SQLite integration & optimization
-├── generate_input.py     # Scalable dataset generator
-├── input.txt             # Input dataset
-├── text_results.db       # SQLite database
-├── .gitignore
-└── README.md
-4. Weighted Rule-Based Sentiment Engine
-Milestone 2 replaces simple counting with weighted scoring.
+│── app.py
+│── rule_engine.py
+│── file_handler.py
+│── requirements.txt
+│── README.md
+│── LICENSE
+│── agile.md
+```
 
-Positive Rules
-"excellent": +3
-"amazing": +2
-"good": +1
-"happy": +2
-Negative Rules
-"terrible": -3
-"bad": -1
-"worst": -2
-"error": -2
-Scoring Formula
-Final Score = Sum of matched word weights
-Classification
-Score > 0 → Positive
+---
 
-Score < 0 → Negative
+## ▶️ How to Run the Project
 
-Score = 0 → Neutral
+### Step 1: Install Dependencies
+```
+pip install -r requirements.txt
+```
 
-This allows more expressive and realistic sentiment evaluation.
+### Step 2: Run Application
+```
+streamlit run app.py
+```
 
-5. Parallel Processing Benchmarking
-The system compares three execution models:
+### Step 3: Open Browser
+```
+http://localhost:8501
+```
 
-1. Single Processing
-Standard for-loop execution.
+---
 
-2. ThreadPoolExecutor
-Uses multiple threads for concurrent execution.
+## 📌 Agile Documentation
 
-3. Multiprocessing Pool
-Uses separate processes for true parallel execution.
+The project was developed incrementally with:
+- Daily progress tracking
+- Feature-based implementation
+- Continuous improvements and bug fixing
 
-Performance Measurement
-Execution time is recorded using:
+---
 
-time.time()
-Example Output:
+## 📜 License
+This project is licensed under the MIT License.
 
-Single Processing Time: 4.82 seconds
-ThreadPool Time: 4.11 seconds
-Multiprocessing Time: 2.35 seconds
-6. CPU-Bound vs I/O-Bound Analysis
-This workload is CPU-bound because:
+---
 
-Sentiment scoring involves repeated computation
-
-Word matching operations dominate execution
-
-Minimal waiting on file or network I/O
-
-Multiprocessing performs better due to Python's Global Interpreter Lock (GIL), which restricts true parallelism in threading for CPU-bound tasks.
-
-7. Scalability Testing
-The system was tested with increasing dataset sizes:
-
-100 reviews
-
-10,000 reviews
-
-100,000 reviews
-
-For each dataset, the following metrics were recorded:
-
-Processing time
-
-Bulk insert time
-
-Query time
-
-Performance growth was analyzed to observe scalability patterns.
-
-8. Database Optimization
-Milestone 2 introduces two major optimizations:
-
-1. Bulk Insert using executemany()
-Instead of inserting row-by-row, all processed data is inserted in a single transaction.
-This significantly reduces commit overhead.
-
-2. Index Creation
-CREATE INDEX idx_sentiment ON text_results(sentiment);
-This improves filtering queries on sentiment.
-
-Query Benchmark
-Query time before and after indexing shows measurable improvement, especially for large datasets.
-
-9. Performance Components Measured
-The system records:
-
-Single Processing Time
-
-ThreadPool Time
-
-Multiprocessing Time
-
-Bulk Insert Time
-
-Indexed Query Time
-
-This provides full visibility into computational and database overhead.
-
-10. How to Run
-Step 1 – Generate Dataset
-python generate_input.py
-Enter desired number of reviews.
-
-Step 2 – Execute Pipeline
-python main.py
-Enter chunk size when prompted.
-
-11. Key Learnings from Milestone 2
-Weighted rule systems provide more realistic scoring.
-
-Multiprocessing improves CPU-bound workload performance.
-
-Threading may not outperform single execution due to GIL.
-
-Bulk insertion drastically improves database write speed.
-
-Indexing significantly reduces query time.
-
-Scalability testing reveals non-linear growth patterns.
-
-12. Future Improvements
-Replace rule engine with NLP model
-
-Add REST API layer
-
-Add visualization dashboard
-
-Introduce caching layer
-
-Implement distributed processing
-
-13. Author
+## 👨‍💻 Author
 Samhith Arava
 
+---
+
+## 💡 Final Note
+This project demonstrates both functional implementation and performance analysis, making it a complete end-to-end system for large-scale text processing and sentiment evaluation.
