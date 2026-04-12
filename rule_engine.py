@@ -1,5 +1,5 @@
-positive_words = ["good", "excellent", "amazing", "happy", "great"]
-negative_words = ["bad", "terrible", "worst", "poor", "boring", "difficult"]
+positive_words = {"good", "excellent", "amazing", "happy", "great"}
+negative_words = {"bad", "terrible", "worst", "poor", "boring", "difficult"}
 
 def analyze_text(text):
     words = text.lower().split()
